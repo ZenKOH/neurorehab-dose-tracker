@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NeuroRehab Dose Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">Local browser app</p>
+      <h1>NeuroRehab Dose Tracker</h1>
+      <p class="subtitle">Track therapy dose, quality, fatigue, and carryover between sessions. Runs fully offline on your MacBook.</p>
+    </div>
+    <div class="header-actions">
+      <button id="exportCsvBtn" class="secondary">Export CSV</button>
+      <button id="loadSampleBtn" class="secondary">Load sample</button>
+      <button id="clearBtn" class="danger">Clear data</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel form-panel">
+      <h2>Add a session</h2>
+      <form id="sessionForm">
+        <label>
+          Date
+          <input id="date" type="date" required />
+        </label>
+
+        <label>
+          Patient / case label
+          <input id="caseLabel" type="text" placeholder="e.g. Case A, Patient initials, Self" maxlength="40" />
+        </label>
+
+        <label>
+          Therapy focus
+          <select id="focus" required>
+            <option value="Upper limb">Upper limb</option>
+            <option value="Gait">Gait</option>
+            <option value="Balance">Balance</option>
+            <option value="Cognition">Cognition</option>
+            <option value="Speech / swallowing">Speech / swallowing</option>
+            <option value="Functional task practice">Functional task practice</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+
+        <label>
+          Task practised
+          <input id="task" type="text" placeholder="e.g. sit-to-stand, reaching, walking, grasp-release" required />
+        </label>
+
+        <div class="grid-2">
+          <label>
+            Minutes
+            <input id="minutes" type="number" min="0" step="1" value="30" required />
+          </label>
+          <label>
+            Repetitions
+            <input id="reps" type="number" min="0" step="1" value="100" required />
+          </label>
+        </div>
+
+        <div class="grid-2">
+          <label>
+            Quality score <span class="hint">1–5</span>
+            <input id="quality" type="number" min="1" max="5" step="1" value="3" required />
+          </label>
+          <label>
+            Fatigue <span class="hint">0–10</span>
+            <input id="fatigue" type="number" min="0" max="10" step="1" value="4" required />
+          </label>
+        </div>
+
+        <label>
+          Carryover observed?
+          <select id="carryover">
+            <option value="Not assessed">Not assessed</option>
+            <option value="Yes, in daily activity">Yes, in daily activity</option>
+            <option value="Partial">Partial</option>
+            <option value="No">No</option>
+          </select>
+        </label>
+
+        <label>
+          Notes
+          <textarea id="notes" rows="4" placeholder="Context, barriers, therapist observations, home practice notes"></textarea>
+        </label>
+
+        <button type="submit" class="primary">Save session</button>
+      </form>
+    </section>
+
+    <section class="dashboard">
+      <div class="panel targets-panel">
+        <h2>Weekly targets</h2>
+        <div class="grid-3">
+          <label>
+            Minutes / week
+            <input id="targetMinutes" type="number" min="0" value="180" />
+          </label>
+          <label>
+            Reps / week
+            <input id="targetReps" type="number" min="0" value="1000" />
+          </label>
+          <label>
+            Minimum quality
+            <input id="targetQuality" type="number" min="1" max="5" value="3" />
+          </label>
+        </div>
+        <button id="saveTargetsBtn" class="secondary">Save targets</button>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-card">
+          <span>Sessions this week</span>
+          <strong id="sessionsThisWeek">0</strong>
+        </article>
+        <article class="stat-card">
+          <span>Minutes this week</span>
+          <strong id="minutesThisWeek">0</strong>
+        </article>
+        <article class="stat-card">
+          <span>Reps this week</span>
+          <strong id="repsThisWeek">0</strong>
+        </article>
+        <article class="stat-card">
+          <span>Average quality</span>
+          <strong id="avgQuality">0.0</strong>
+        </article>
+      </div>
+
+      <section class="panel">
+        <h2>Dose progress</h2>
+        <div class="progress-row">
+          <div>
+            <span>Minutes</span>
+            <div class="progress"><div id="minutesBar" class="bar"></div></div>
+          </div>
+          <strong id="minutesPct">0%</strong>
+        </div>
+        <div class="progress-row">
+          <div>
+            <span>Repetitions</span>
+            <div class="progress"><div id="repsBar" class="bar"></div></div>
+          </div>
+          <strong id="repsPct">0%</strong>
+        </div>
+      </section>
+
+      <section class="panel insight-panel">
+        <h2>Simple AI-style review</h2>
+        <div id="insights" class="insights"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Recent sessions</h2>
+        <div id="sessionsList" class="sessions-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    <p>This tool is for tracking and education only. It is not medical advice and does not replace a licensed clinician.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
