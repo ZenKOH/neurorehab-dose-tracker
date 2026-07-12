@@ -27,6 +27,13 @@ This is no longer just a session diary. The upgraded app is designed as a lightw
   - clinician review consideration
   - severity label
 - Show a therapist dashboard across multiple cases.
+- Switch the complete workflow between:
+  - English
+  - Simplified Chinese (简体中文)
+  - Spanish (Español)
+  - French (Français)
+  - German (Deutsch)
+  - Malay (Bahasa Melayu)
 - Export:
   - CSV session dataset
   - clinician-readable progress note
@@ -106,6 +113,40 @@ It is not:
 - a replacement for licensed clinical judgement
 
 The AI-Generated Review section is rule-based and explainable. It is intended to support clinician review, not to make or automate treatment decisions.
+
+## Multilingual design
+
+The language control in the header changes navigation, forms, clinical review prompts, charts, status messages, programme terminology and progress-note exports without reloading the page.
+
+- The selected language is stored locally and works offline.
+- The document `lang` attribute and locale-aware dates update with the selection for assistive technology.
+- Select controls retain stable English data values underneath translated labels, so dose and carryover rules remain deterministic.
+- FHIR-shaped exports include a BCP 47 `language` value on the bundle and resources.
+- User-entered clinical text is preserved exactly; the app does not machine-translate clinical notes or goals.
+
+Translations are product-localisation drafts and should receive native-speaking clinical review before deployment in care settings.
+
+## Evidence-informed product decisions
+
+- Targets remain clinician-configurable and needs-based. NICE recommends needs-based multidisciplinary rehabilitation after stroke and explicitly preserves individual clinical judgement; the prototype therefore does not impose a single target across diagnoses or phases.
+- Scheduled time, active practice, repetitions, tolerance and functional carryover remain distinct measures rather than being collapsed into one dose score.
+- The active page language is declared in the HTML document in line with W3C accessibility guidance.
+- The FHIR-shaped export uses the standard resource `language` element described by HL7 FHIR.
+
+Primary references:
+
+- [NICE NG236: Stroke rehabilitation in adults](https://www.nice.org.uk/guidance/ng236/chapter/Recommendations)
+- [WHO: Rehabilitation fact sheet](https://www.who.int/news-room/fact-sheets/detail/rehabilitation)
+- [W3C: Understanding language of page](https://www.w3.org/WAI/WCAG22/Understanding/language-of-page.html)
+- [HL7 FHIR: Languages](https://fhir.hl7.org/fhir/languages.html)
+
+## Validation
+
+```bash
+npm test
+```
+
+The test suite checks all supported language codes, representative clinical translations, dynamic numeric messages and language persistence.
 
 ## Roadmap
 
