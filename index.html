@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NeuroRehab Dose Tracker</title>
-  <link rel="stylesheet" href="styles.css?v=20260712-4" />
-  <link rel="stylesheet" href="overrides.css?v=20260712-4" />
+  <link rel="stylesheet" href="styles.css?v=20260712-5" />
+  <link rel="stylesheet" href="overrides.css?v=20260712-5" />
 </head>
 <body>
   <header class="app-header">
@@ -37,7 +37,7 @@
         <button id="exportNoteBtn" type="button" class="secondary">Export progress note</button>
         <button id="exportFhirBtn" type="button" class="secondary">Export FHIR JSON</button>
         <button id="backupBtn" type="button" class="secondary">Backup JSON</button>
-        <label class="file-button secondary" tabindex="0">
+        <label id="restoreLabel" class="file-button secondary" tabindex="0">
           Restore JSON
           <input id="restoreInput" type="file" accept="application/json,.json" />
         </label>
@@ -47,11 +47,12 @@
   </header>
 
   <nav class="tab-nav" aria-label="Application sections">
-    <button type="button" class="tab-button active" data-tab="overview">Overview</button>
-    <button type="button" class="tab-button" data-tab="programmes">Programmes</button>
-    <button type="button" class="tab-button" data-tab="sessions">Sessions</button>
-    <button type="button" class="tab-button" data-tab="outcomes">Outcomes</button>
-    <button type="button" class="tab-button" data-tab="reports">Reports</button>
+    <a href="#overview" class="tab-button active" data-tab="overview" aria-controls="overview">Overview</a>
+    <a href="#programmes" class="tab-button" data-tab="programmes" aria-controls="programmes">Programmes</a>
+    <a href="#sessions" class="tab-button" data-tab="sessions" aria-controls="sessions">Sessions</a>
+    <a href="#equipment" class="tab-button" data-tab="equipment" aria-controls="equipment">Equipment</a>
+    <a href="#outcomes" class="tab-button" data-tab="outcomes" aria-controls="outcomes">Outcomes</a>
+    <a href="#reports" class="tab-button" data-tab="reports" aria-controls="reports">Reports</a>
   </nav>
 
   <div id="appStatus" class="app-status" role="status" aria-live="polite"></div>
@@ -68,6 +69,14 @@
           <select id="reviewCaseFilter"></select>
         </label>
       </section>
+
+      <nav class="workflow-links" aria-label="Clinical workflow shortcuts">
+        <a href="#programmes" class="workflow-link" data-tab="programmes"><span>1</span> Create programme</a>
+        <a href="#sessions" class="workflow-link" data-tab="sessions"><span>2</span> Log therapy</a>
+        <a href="#equipment" class="workflow-link" data-tab="equipment"><span>3</span> Manage equipment</a>
+        <a href="#outcomes" class="workflow-link" data-tab="outcomes"><span>4</span> Record outcomes</a>
+        <a href="#reports" class="workflow-link" data-tab="reports"><span>5</span> Review reports</a>
+      </nav>
 
       <section class="stats-grid" aria-label="Key clinical indicators">
         <article class="stat-card"><span>Active minutes this week</span><strong id="minutesThisWeek">0</strong><small id="minutesTargetLabel">Target: 0</small></article>
@@ -103,7 +112,7 @@
             <div class="grid-2"><label>Review date <input id="reviewDate" type="date" /></label><label>Responsible clinician <input id="clinician" type="text" placeholder="Therapist / team" maxlength="60" /></label></div>
             <label>ICF / participation frame <textarea id="icfFrame" rows="2" placeholder="Activity limitation, participation goal and environmental factors"></textarea></label>
             <label>Precautions / clinical boundaries <textarea id="precautions" rows="2" placeholder="e.g. monitor fatigue; review pain > 6/10"></textarea></label>
-            <button type="submit" class="primary">Save programme</button>
+            <div class="form-actions"><button type="submit" class="primary">Save programme</button><a href="#sessions" class="secondary route-link" data-tab="sessions">Next: log a session</a></div>
           </form>
         </section>
         <section class="panel"><div class="section-heading"><h2>Programme list</h2><p>18 synthetic sample cases load by default and can be reloaded using Load sample.</p></div><div id="programmeList" class="cards-list"></div></section>
@@ -123,12 +132,39 @@
             <div class="grid-2"><label>Assistance level <select id="assistance"><option>Independent</option><option>Verbal cueing</option><option>Manual assist</option><option>Robotic assist</option><option>Caregiver assist</option><option>Mixed assist</option></select></label><label>Challenge level <select id="challenge"><option>Too easy</option><option selected>Appropriate</option><option>Too difficult</option></select></label></div>
             <div class="grid-2"><label>Task specificity <select id="specificity"><option>Directly linked to functional goal</option><option>Partially linked to functional goal</option><option>General conditioning / preparatory</option><option>Unclear link</option></select></label><label>Carryover observed? <select id="carryover"><option>Not assessed</option><option>Yes, in daily activity</option><option>Partial</option><option>No</option></select></label></div>
             <div class="grid-2"><label>Home adherence <select id="homeAdherence"><option>Not applicable</option><option>High</option><option>Moderate</option><option>Low</option><option>Not reported</option></select></label><label>Rest breaks <input id="restBreaks" type="number" min="0" step="1" value="1" /></label></div>
+            <fieldset class="equipment-picker-fieldset">
+              <legend>Equipment used</legend>
+              <p class="field-help">Select one or more devices used in this session. <a href="#equipment" data-tab="equipment">Manage equipment library</a></p>
+              <div id="sessionEquipmentPicker" class="equipment-picker" aria-live="polite"></div>
+            </fieldset>
             <label>Clinical notes <textarea id="notes" rows="4" placeholder="Context, barriers, therapist observations, home practice notes"></textarea></label>
-            <button type="submit" class="primary">Save session</button>
+            <div class="form-actions"><button type="submit" class="primary">Save session</button><a href="#outcomes" class="secondary route-link" data-tab="outcomes">Next: record an outcome</a></div>
           </form>
         </section>
         <section class="panel"><div class="section-heading"><h2>Recent sessions</h2><p>Sample data includes 54 synthetic therapy sessions across 18 cases.</p></div><div id="sessionsList" class="sessions-list"></div></section>
       </div>
+    </section>
+
+    <section id="equipment" class="tab-panel" hidden>
+      <div class="two-column">
+        <section class="panel">
+          <div class="section-heading"><h2>Equipment library</h2><p>Add rehabilitation equipment once, then attach it to therapy sessions. Use pseudonymous internal identifiers rather than sensitive asset data in public demonstrations.</p></div>
+          <form id="equipmentForm">
+            <input id="equipmentId" type="hidden" />
+            <label>Equipment name <input id="equipmentName" type="text" placeholder="e.g. HandVivante™" maxlength="80" required /></label>
+            <div class="grid-2">
+              <label>Category <select id="equipmentCategory"><option>Upper-limb robotics</option><option>Gait robotics</option><option>Balance and mobility</option><option>FES / electrostimulation</option><option>Therapy technology</option><option>Assistive product</option><option>Other</option></select></label>
+              <label>Status <select id="equipmentStatus"><option>Active</option><option>Inactive</option><option>Maintenance</option></select></label>
+            </div>
+            <div class="grid-2"><label>Manufacturer <input id="equipmentManufacturer" type="text" placeholder="Manufacturer or supplier" maxlength="80" /></label><label>Model <input id="equipmentModel" type="text" placeholder="Model or configuration" maxlength="80" /></label></div>
+            <label>Internal identifier <input id="equipmentIdentifier" type="text" placeholder="Optional asset, inventory or pseudonymous device ID" maxlength="80" /></label>
+            <label>Equipment notes <textarea id="equipmentNotes" rows="3" placeholder="Clinical purpose, configuration, accessories or local usage notes"></textarea></label>
+            <div class="form-actions"><button type="submit" class="primary">Save equipment</button><button id="cancelEquipmentEditBtn" type="button" class="secondary">Cancel edit</button></div>
+          </form>
+        </section>
+        <section class="panel"><div class="section-heading"><h2>Available equipment</h2><p>The starter library includes common Vivante-series examples and can be adapted to any clinic or research site.</p></div><div id="equipmentList" class="cards-list"></div></section>
+      </div>
+      <section class="panel"><div class="section-heading"><h2>Equipment utilisation</h2><p>Session count, active practice minutes and repetitions attributed to each selected device.</p></div><div class="table-wrap"><table class="equipment-table"><thead><tr><th>Equipment</th><th>Category</th><th>Status</th><th>Sessions</th><th>Active minutes</th><th>Repetitions</th><th>Last used</th></tr></thead><tbody id="equipmentUsageTable"></tbody></table></div></section>
     </section>
 
     <section id="outcomes" class="tab-panel" hidden>
@@ -141,7 +177,7 @@
             <div class="grid-3"><label>Baseline <input id="baselineValue" type="text" placeholder="e.g. 0.42 m/s" /></label><label>Current <input id="currentValue" type="text" placeholder="e.g. 0.58 m/s" /></label><label>Target <input id="targetValue" type="text" placeholder="e.g. 0.70 m/s" /></label></div>
             <div class="grid-2"><label>Measurement date <input id="outcomeDate" type="date" /></label><label>Direction <select id="outcomeDirection"><option>Higher is better</option><option>Lower is better</option><option>Goal-specific</option></select></label></div>
             <label>Clinician note <textarea id="outcomeNote" rows="2" placeholder="Measurement condition, assistive device, cueing, or caveats"></textarea></label>
-            <button type="submit" class="primary">Save outcome</button>
+            <div class="form-actions"><button type="submit" class="primary">Save outcome</button><a href="#reports" class="secondary route-link" data-tab="reports">Next: review reports</a></div>
           </form>
         </section>
         <section class="panel"><div class="section-heading"><h2>Functional trajectory</h2><p>Baseline, current and target values shown as visual trajectory markers when numeric values are available.</p></div><div id="outcomeTrajectoryChart" class="outcome-visuals"></div><div id="outcomesList" class="sessions-list"></div></section>
@@ -158,7 +194,7 @@
     <p>This tool is for tracking, education, workflow exploration and pilot evidence generation only. It is not medical advice and does not replace a licensed clinician. Avoid entering directly identifiable patient information in this static GitHub Pages prototype.</p>
   </footer>
 
-  <script defer src="i18n.js?v=20260712-4"></script>
-  <script defer src="app-v4.js?v=20260712-4"></script>
+  <script defer src="i18n.js?v=20260712-5"></script>
+  <script defer src="app-v4.js?v=20260712-5"></script>
 </body>
 </html>
