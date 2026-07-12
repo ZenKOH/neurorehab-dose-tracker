@@ -1,0 +1,47 @@
+/* Production polish overrides: equal buttons, clearer spacing and reliable tab visibility. */
+.header-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(190px, 1fr)) !important;
+  gap: 12px !important;
+  width: min(100%, 590px) !important;
+  align-items: stretch !important;
+}
+.header-actions > button,
+.header-actions > .file-button {
+  width: 100% !important;
+  min-height: 50px !important;
+  padding: 12px 16px !important;
+  white-space: normal !important;
+  text-align: center !important;
+}
+.tab-nav {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(140px, 1fr)) !important;
+  gap: 10px !important;
+}
+.tab-button {
+  min-height: 52px !important;
+  width: 100% !important;
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.tab-panel[hidden] { display: none !important; }
+.app-status {
+  width: min(1480px, calc(100% - clamp(36px, 8vw, 128px)));
+  min-height: 24px;
+  margin: 14px auto 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 850;
+}
+.app-shell { padding-top: 16px !important; }
+.panel { margin-bottom: 22px !important; }
+.chart-box, .donut-wrap, .outcome-visuals { overflow: auto; }
+.cards-list, .sessions-list, .insights { gap: 14px !important; }
+@media (max-width: 1180px) {
+  .header-actions { grid-template-columns: repeat(3, minmax(150px, 1fr)) !important; width: 100% !important; }
+}
+@media (max-width: 820px) {
+  .header-actions, .tab-nav { grid-template-columns: 1fr !important; }
+  .app-status { width: calc(100% - 32px); }
+}
