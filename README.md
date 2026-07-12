@@ -1,6 +1,6 @@
 # NeuroRehab Dose Tracker
 
-A browser-based clinical workflow prototype for neurorehabilitation dose tracking, programme review, functional carryover, and therapist documentation support.
+A browser-based clinical workflow prototype for neurorehabilitation dose tracking, programme review, functional carryover, equipment use, and therapist documentation support.
 
 This is no longer just a session diary. The upgraded app is designed as a lightweight **rehabilitation continuity and evidence tool** for therapists, pilot sites, and clinical innovation teams.
 
@@ -21,12 +21,13 @@ This is no longer just a session diary. The upgraded app is designed as a lightw
   - home adherence
   - functional carryover
 - Track configurable outcome measures such as 10MWT, 6MWT, TUG, ARAT, Goal Attainment Scaling, or patient-specific goals.
-- Maintain an equipment library and attach one or more devices to each therapy session:
+- Select session equipment from a dropdown list and maintain an editable equipment library:
   - HandVivante™
   - GaitVivante™
   - ElevoVivante™
   - RevitaVivante™
-  - custom clinic or research equipment
+  - Custom clinic or research devices
+- Add, edit, deactivate or delete equipment from the Equipment tab for future clinic, pilot or research configurations.
 - Review equipment utilisation by session count, active minutes, repetitions and last-use date.
 - Generate explainable AI-style review prompts with:
   - trigger
@@ -49,7 +50,7 @@ This is no longer just a session diary. The upgraded app is designed as a lightw
 
 ## Why this exists
 
-Therapy dose is clinically meaningful only when it is connected to quality, fatigue, tolerance, functional carryover, goals, outcomes, and documentation.
+Therapy dose is clinically meaningful only when it is connected to quality, fatigue, tolerance, functional carryover, goals, outcomes, equipment use, and documentation.
 
 The product direction follows three adoption realities:
 
@@ -83,11 +84,12 @@ http://localhost:8000
 
 1. Create a programme.
 2. Define the primary functional goal and weekly targets.
-3. Record therapy sessions using active practice minutes, repetitions, quality, fatigue, pain, challenge, task specificity, assistance and carryover.
-4. Add outcome measures at baseline and review points.
-5. Review the therapist dashboard and AI-Generated Review prompts.
-6. Export a progress note or CSV for documentation and service-review purposes.
-7. Backup data as JSON if you want to preserve local records.
+3. Add or edit equipment in the Equipment tab if the default list does not match the clinic or research site.
+4. Record therapy sessions using active practice minutes, repetitions, quality, fatigue, pain, challenge, task specificity, assistance, carryover and the equipment dropdown.
+5. Add outcome measures at baseline and review points.
+6. Review the therapist dashboard, equipment utilisation table and AI-Generated Review prompts.
+7. Export a progress note, CSV or FHIR-shaped JSON file for documentation and service-review purposes.
+8. Backup data as JSON if you want to preserve local records.
 
 ## Privacy
 
@@ -101,6 +103,8 @@ The app exports a prototype FHIR-shaped JSON bundle using concepts such as:
 
 - Patient
 - CarePlan
+- Device
+- Procedure
 - Goal
 - Observation
 
@@ -127,7 +131,7 @@ The language control in the header changes navigation, forms, clinical review pr
 
 - The selected language is stored locally and works offline.
 - The document `lang` attribute and locale-aware dates update with the selection for assistive technology.
-- Select controls retain stable English data values underneath translated labels, so dose and carryover rules remain deterministic.
+- Select controls retain stable English data values underneath translated labels, so dose, equipment and carryover rules remain deterministic.
 - FHIR-shaped exports include a BCP 47 `language` value on the bundle and resources.
 - FHIR-shaped exports represent equipment as `Device` resources and therapy sessions as `Procedure` resources with `usedReference` links.
 - User-entered clinical text is preserved exactly; the app does not machine-translate clinical notes or goals.
@@ -137,21 +141,23 @@ Translations are product-localisation drafts and should receive native-speaking 
 ## Evidence-informed product decisions
 
 - Targets remain clinician-configurable and needs-based. NICE recommends needs-based multidisciplinary rehabilitation after stroke and explicitly preserves individual clinical judgement; the prototype therefore does not impose a single target across diagnoses or phases.
-- Scheduled time, active practice, repetitions, tolerance and functional carryover remain distinct measures rather than being collapsed into one dose score.
+- Scheduled time, active practice, repetitions, tolerance, equipment use and functional carryover remain distinct measures rather than being collapsed into one dose score.
+- Session equipment is selected from a native dropdown to reduce click load during documentation while still preserving an editable equipment library.
 - The active page language is declared in the HTML document in line with W3C accessibility guidance.
 - Navigation destinations use native links with stable URL fragments, while downloads, form submissions and destructive operations remain action buttons.
 - The FHIR-shaped export uses the standard resource `language` element described by HL7 FHIR.
-- Equipment is modelled using the core fields of HL7 FHIR R4 `Device`; session use is linked through `Procedure.usedReference`.
+- Equipment is modelled using the core fields of HL7 FHIR `Device`; session use is linked through `Procedure.usedReference`.
 
 Primary references:
 
 - [NICE NG236: Stroke rehabilitation in adults](https://www.nice.org.uk/guidance/ng236/chapter/Recommendations)
 - [WHO: Rehabilitation fact sheet](https://www.who.int/news-room/fact-sheets/detail/rehabilitation)
 - [W3C: Understanding language of page](https://www.w3.org/WAI/WCAG22/Understanding/language-of-page.html)
+- [W3C WAI: Forms Tutorial](https://www.w3.org/WAI/tutorials/forms/)
 - [W3C WAI: Link pattern](https://www.w3.org/WAI/ARIA/apg/patterns/link/)
 - [WHO: Assistive technology](https://www.who.int/news-room/fact-sheets/detail/assistive-technology)
 - [HL7 FHIR: Languages](https://fhir.hl7.org/fhir/languages.html)
-- [HL7 FHIR R4: Device](https://hl7.org/fhir/R4/device.html)
+- [HL7 FHIR: Device](https://hl7.org/fhir/device.html)
 - [HL7 FHIR R4: Procedure](https://hl7.org/fhir/R4/procedure.html)
 
 ## Validation
@@ -160,7 +166,7 @@ Primary references:
 npm test
 ```
 
-The test suite checks all supported language codes, representative clinical translations, dynamic numeric messages and language persistence.
+The test suite checks all supported language codes, representative clinical translations, dynamic numeric messages and language persistence. The `npm run check` command also checks the app and equipment compatibility scripts for JavaScript syntax.
 
 ## Roadmap
 
@@ -169,6 +175,7 @@ The test suite checks all supported language codes, representative clinical tran
 - [x] Programme layer
 - [x] Expanded clinical dose model
 - [x] Outcome tracker
+- [x] Equipment dropdown in session logging
 - [x] Equipment library and session-device linkage
 - [x] Equipment utilisation analytics
 - [x] Therapist dashboard
