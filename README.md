@@ -21,6 +21,13 @@ This is no longer just a session diary. The upgraded app is designed as a lightw
   - home adherence
   - functional carryover
 - Track configurable outcome measures such as 10MWT, 6MWT, TUG, ARAT, Goal Attainment Scaling, or patient-specific goals.
+- Maintain an equipment library and attach one or more devices to each therapy session:
+  - HandVivante™
+  - GaitVivante™
+  - ElevoVivante™
+  - RevitaVivante™
+  - custom clinic or research equipment
+- Review equipment utilisation by session count, active minutes, repetitions and last-use date.
 - Generate explainable AI-style review prompts with:
   - trigger
   - interpretation
@@ -122,6 +129,7 @@ The language control in the header changes navigation, forms, clinical review pr
 - The document `lang` attribute and locale-aware dates update with the selection for assistive technology.
 - Select controls retain stable English data values underneath translated labels, so dose and carryover rules remain deterministic.
 - FHIR-shaped exports include a BCP 47 `language` value on the bundle and resources.
+- FHIR-shaped exports represent equipment as `Device` resources and therapy sessions as `Procedure` resources with `usedReference` links.
 - User-entered clinical text is preserved exactly; the app does not machine-translate clinical notes or goals.
 
 Translations are product-localisation drafts and should receive native-speaking clinical review before deployment in care settings.
@@ -131,14 +139,20 @@ Translations are product-localisation drafts and should receive native-speaking 
 - Targets remain clinician-configurable and needs-based. NICE recommends needs-based multidisciplinary rehabilitation after stroke and explicitly preserves individual clinical judgement; the prototype therefore does not impose a single target across diagnoses or phases.
 - Scheduled time, active practice, repetitions, tolerance and functional carryover remain distinct measures rather than being collapsed into one dose score.
 - The active page language is declared in the HTML document in line with W3C accessibility guidance.
+- Navigation destinations use native links with stable URL fragments, while downloads, form submissions and destructive operations remain action buttons.
 - The FHIR-shaped export uses the standard resource `language` element described by HL7 FHIR.
+- Equipment is modelled using the core fields of HL7 FHIR R4 `Device`; session use is linked through `Procedure.usedReference`.
 
 Primary references:
 
 - [NICE NG236: Stroke rehabilitation in adults](https://www.nice.org.uk/guidance/ng236/chapter/Recommendations)
 - [WHO: Rehabilitation fact sheet](https://www.who.int/news-room/fact-sheets/detail/rehabilitation)
 - [W3C: Understanding language of page](https://www.w3.org/WAI/WCAG22/Understanding/language-of-page.html)
+- [W3C WAI: Link pattern](https://www.w3.org/WAI/ARIA/apg/patterns/link/)
+- [WHO: Assistive technology](https://www.who.int/news-room/fact-sheets/detail/assistive-technology)
 - [HL7 FHIR: Languages](https://fhir.hl7.org/fhir/languages.html)
+- [HL7 FHIR R4: Device](https://hl7.org/fhir/R4/device.html)
+- [HL7 FHIR R4: Procedure](https://hl7.org/fhir/R4/procedure.html)
 
 ## Validation
 
@@ -155,6 +169,8 @@ The test suite checks all supported language codes, representative clinical tran
 - [x] Programme layer
 - [x] Expanded clinical dose model
 - [x] Outcome tracker
+- [x] Equipment library and session-device linkage
+- [x] Equipment utilisation analytics
 - [x] Therapist dashboard
 - [x] Explainable review prompts
 - [x] Progress note export
