@@ -1,31 +1,61 @@
 # NeuroRehab Dose Tracker
 
-A tiny browser-based app for tracking neurorehabilitation therapy dose, quality, fatigue, repetitions, and carryover.
+A browser-based clinical workflow prototype for neurorehabilitation dose tracking, programme review, functional carryover, and therapist documentation support.
 
-It runs fully offline on a MacBook. No backend, no API key, no account, and no installation required.
+This is no longer just a session diary. The upgraded app is designed as a lightweight **rehabilitation continuity and evidence tool** for therapists, pilot sites, and clinical innovation teams.
 
 ## What it does
 
-- Add therapy sessions with minutes, repetitions, movement quality, fatigue, and carryover.
-- Set weekly dose targets.
-- See weekly progress for therapy minutes and repetitions.
-- Get simple AI-style rule-based review prompts.
-- Store data locally in your browser using `localStorage`.
-- Export all session data as CSV.
+- Create therapy programmes around a case label, diagnosis/pathway, rehabilitation phase, primary functional goal, secondary goals, precautions, clinician, review date, and weekly targets.
+- Track multidimensional rehabilitation dose:
+  - scheduled minutes
+  - active practice minutes
+  - repetitions
+  - movement quality
+  - fatigue
+  - pain/discomfort
+  - assistance level
+  - challenge level
+  - task specificity
+  - rest breaks
+  - home adherence
+  - functional carryover
+- Track configurable outcome measures such as 10MWT, 6MWT, TUG, ARAT, Goal Attainment Scaling, or patient-specific goals.
+- Generate explainable AI-style review prompts with:
+  - trigger
+  - interpretation
+  - clinician review consideration
+  - severity label
+- Show a therapist dashboard across multiple cases.
+- Export:
+  - CSV session dataset
+  - clinician-readable progress note
+  - FHIR-shaped JSON prototype export
+  - full JSON backup / restore file
 
-## Run immediately on Mac
+## Why this exists
 
-### Option 1: Open directly
+Therapy dose is clinically meaningful only when it is connected to quality, fatigue, tolerance, functional carryover, goals, outcomes, and documentation.
 
-1. Download or clone this repository.
-2. Open `index.html` in Safari, Chrome, Arc, or Edge.
-3. Start logging sessions.
+The product direction follows three adoption realities:
 
-### Option 2: Run as a local web server
+1. Rehabilitation needs better functioning data and stronger integration into health systems.
+2. Digital health tools need evidence-generation workflows, not just attractive dashboards.
+3. Therapist adoption depends on reducing documentation friction and improving clinical visibility between sessions.
 
-Open Terminal in this folder and run:
+## Use the app
+
+Open the GitHub Pages version:
+
+```text
+https://zenkoh.github.io/neurorehab-dose-tracker/
+```
+
+Or run locally:
 
 ```bash
+git clone https://github.com/ZenKOH/neurorehab-dose-tracker.git
+cd neurorehab-dose-tracker
 python3 -m http.server 8000
 ```
 
@@ -35,34 +65,89 @@ Then open:
 http://localhost:8000
 ```
 
-## Put it on GitHub
+## Recommended workflow
 
-```bash
-git init
-git add .
-git commit -m "Initial NeuroRehab Dose Tracker"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/neurorehab-dose-tracker.git
-git push -u origin main
-```
-
-Replace `YOUR-USERNAME` with your GitHub username.
-
-## Optional: Publish with GitHub Pages
-
-1. Go to your GitHub repository.
-2. Open **Settings**.
-3. Open **Pages**.
-4. Set source to **Deploy from a branch**.
-5. Select branch **main** and folder **/root**.
-6. Save.
-
-GitHub will give you a public URL for the app.
+1. Create a programme.
+2. Define the primary functional goal and weekly targets.
+3. Record therapy sessions using active practice minutes, repetitions, quality, fatigue, pain, challenge, task specificity, assistance and carryover.
+4. Add outcome measures at baseline and review points.
+5. Review the therapist dashboard and AI-Generated Review prompts.
+6. Export a progress note or CSV for documentation and service-review purposes.
+7. Backup data as JSON if you want to preserve local records.
 
 ## Privacy
 
-All data is stored locally in the browser on your own machine. Nothing is uploaded anywhere unless you manually export or publish your files.
+This static prototype stores data in the browser's local storage. It does not upload data to a backend.
 
-## Medical disclaimer
+Do not enter directly identifiable patient information in the public GitHub Pages version. Use pseudonymous case labels such as `Case A` or initials only if permitted by your local policy.
 
-This tool is for tracking, education, and workflow exploration only. It is not medical advice and does not replace a licensed clinician.
+## FHIR-shaped export
+
+The app exports a prototype FHIR-shaped JSON bundle using concepts such as:
+
+- Patient
+- CarePlan
+- Goal
+- Observation
+
+This is intended for interoperability planning and technical discussion only. It is not a validated EHR integration.
+
+## Clinical and regulatory scope
+
+This tool is for tracking, education, workflow exploration, documentation support and pilot evidence generation only.
+
+It is not:
+
+- medical advice
+- a diagnostic system
+- an autonomous treatment recommender
+- a safety certification system
+- a regulated medical device
+- a replacement for licensed clinical judgement
+
+The AI-Generated Review section is rule-based and explainable. It is intended to support clinician review, not to make or automate treatment decisions.
+
+## Roadmap
+
+### Phase 1: Therapist-grade static app
+
+- [x] Programme layer
+- [x] Expanded clinical dose model
+- [x] Outcome tracker
+- [x] Therapist dashboard
+- [x] Explainable review prompts
+- [x] Progress note export
+- [x] CSV export
+- [x] FHIR-shaped JSON export
+- [x] JSON backup and restore
+
+### Phase 2: Clinical workflow version
+
+- [ ] Encrypted storage
+- [ ] Therapist and patient/caregiver roles
+- [ ] Audit log
+- [ ] Clinic-level dashboard
+- [ ] Consent and privacy settings
+- [ ] PDF reports
+- [ ] Configurable protocols
+
+### Phase 3: Pilot evidence layer
+
+- [ ] Therapist documentation-time tracking
+- [ ] Adherence and carryover analytics
+- [ ] Outcome-change dashboards
+- [ ] Safety-review register
+- [ ] Evidence-readiness report aligned to digital health evaluation frameworks
+
+### Phase 4: Institution-ready product
+
+- [ ] FHIR server integration
+- [ ] EHR export workflow
+- [ ] Governance dashboard
+- [ ] Deployment guide
+- [ ] Clinical validation study pack
+- [ ] Security and privacy documentation
+
+## License
+
+MIT
