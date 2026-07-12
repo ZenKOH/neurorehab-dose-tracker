@@ -4,7 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NeuroRehab Dose Tracker</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20260712-3" />
+  <link rel="stylesheet" href="overrides.css?v=20260712-3" />
 </head>
 <body>
   <header class="app-header">
@@ -12,36 +13,38 @@
       <p class="eyebrow">Clinical Dashboard Edition</p>
       <h1>NeuroRehab Dose Tracker</h1>
       <p class="subtitle">Plan programmes, track multidimensional dose, visualise recovery patterns, and export clinician-readable rehabilitation evidence.</p>
-      <p class="disclaimer-mini">Prototype only. Not medical advice, not a diagnostic system, and not a replacement for licensed clinical judgement.</p>
+      <p class="disclaimer-mini">Prototype only. Not medical advice, not a diagnostic system, and not a replacement for licensed clinical judgement. Sample records are synthetic.</p>
     </div>
     <div class="header-actions" aria-label="Data and export actions">
-      <button id="loadSampleBtn" class="secondary">Load sample</button>
-      <button id="exportCsvBtn" class="secondary">Export CSV</button>
-      <button id="exportNoteBtn" class="secondary">Export progress note</button>
-      <button id="exportFhirBtn" class="secondary">Export FHIR JSON</button>
-      <button id="backupBtn" class="secondary">Backup JSON</button>
-      <label class="file-button secondary">
+      <button id="loadSampleBtn" type="button" class="secondary">Load sample</button>
+      <button id="exportCsvBtn" type="button" class="secondary">Export CSV</button>
+      <button id="exportNoteBtn" type="button" class="secondary">Export progress note</button>
+      <button id="exportFhirBtn" type="button" class="secondary">Export FHIR JSON</button>
+      <button id="backupBtn" type="button" class="secondary">Backup JSON</button>
+      <label class="file-button secondary" tabindex="0">
         Restore JSON
         <input id="restoreInput" type="file" accept="application/json,.json" />
       </label>
-      <button id="clearBtn" class="danger">Clear data</button>
+      <button id="clearBtn" type="button" class="danger">Clear data</button>
     </div>
   </header>
 
   <nav class="tab-nav" aria-label="Application sections">
-    <button class="tab-button active" data-tab="overview">Overview</button>
-    <button class="tab-button" data-tab="programmes">Programmes</button>
-    <button class="tab-button" data-tab="sessions">Sessions</button>
-    <button class="tab-button" data-tab="outcomes">Outcomes</button>
-    <button class="tab-button" data-tab="reports">Reports</button>
+    <button type="button" class="tab-button active" data-tab="overview">Overview</button>
+    <button type="button" class="tab-button" data-tab="programmes">Programmes</button>
+    <button type="button" class="tab-button" data-tab="sessions">Sessions</button>
+    <button type="button" class="tab-button" data-tab="outcomes">Outcomes</button>
+    <button type="button" class="tab-button" data-tab="reports">Reports</button>
   </nav>
+
+  <div id="appStatus" class="app-status" role="status" aria-live="polite"></div>
 
   <main class="app-shell">
     <section id="overview" class="tab-panel active">
       <section class="panel focus-panel">
         <div>
           <h2>Recovery command centre</h2>
-          <p>Visual review of dose, tolerance, carryover, functional trajectory and cases needing clinician attention.</p>
+          <p>Visual review of synthetic neurorehabilitation cases, dose, tolerance, carryover, outcomes and cases needing clinician attention.</p>
         </div>
         <label class="focus-label">
           Review focus
@@ -50,443 +53,87 @@
       </section>
 
       <section class="stats-grid" aria-label="Key clinical indicators">
-        <article class="stat-card">
-          <span>Active minutes this week</span>
-          <strong id="minutesThisWeek">0</strong>
-          <small id="minutesTargetLabel">Target: 0</small>
-        </article>
-        <article class="stat-card">
-          <span>Repetitions this week</span>
-          <strong id="repsThisWeek">0</strong>
-          <small id="repsTargetLabel">Target: 0</small>
-        </article>
-        <article class="stat-card">
-          <span>Average quality</span>
-          <strong id="avgQuality">0.0</strong>
-          <small>1-5 therapist rating</small>
-        </article>
-        <article class="stat-card">
-          <span>Review recommended</span>
-          <strong id="casesNeedingReview">0</strong>
-          <small>Cases with risk or warning flags</small>
-        </article>
+        <article class="stat-card"><span>Active minutes this week</span><strong id="minutesThisWeek">0</strong><small id="minutesTargetLabel">Target: 0</small></article>
+        <article class="stat-card"><span>Repetitions this week</span><strong id="repsThisWeek">0</strong><small id="repsTargetLabel">Target: 0</small></article>
+        <article class="stat-card"><span>Average quality</span><strong id="avgQuality">0.0</strong><small>1-5 therapist rating</small></article>
+        <article class="stat-card"><span>Review recommended</span><strong id="casesNeedingReview">0</strong><small>Cases with risk or warning flags</small></article>
       </section>
 
       <section class="chart-grid">
-        <article class="panel chart-card wide">
-          <div class="section-heading inline">
-            <div>
-              <h2>Weekly dose attainment</h2>
-              <p>Active minutes and repetitions compared with programme targets.</p>
-            </div>
-          </div>
-          <div id="doseChart" class="chart-box" role="img" aria-label="Weekly dose attainment chart"></div>
-          <p id="doseChartSummary" class="chart-summary"></p>
-        </article>
-
-        <article class="panel chart-card">
-          <div class="section-heading inline">
-            <div>
-              <h2>Active vs scheduled practice</h2>
-              <p>How much scheduled time becomes active practice.</p>
-            </div>
-          </div>
-          <div id="activeScheduledChart" class="chart-box compact" role="img" aria-label="Active practice compared with scheduled minutes"></div>
-          <p id="activeScheduledSummary" class="chart-summary"></p>
-        </article>
-
-        <article class="panel chart-card">
-          <div class="section-heading inline">
-            <div>
-              <h2>Carryover distribution</h2>
-              <p>Whether practice transfers into daily function.</p>
-            </div>
-          </div>
-          <div id="carryoverChart" class="donut-wrap" role="img" aria-label="Functional carryover distribution"></div>
-          <p id="carryoverSummary" class="chart-summary"></p>
-        </article>
-
-        <article class="panel chart-card wide">
-          <div class="section-heading inline">
-            <div>
-              <h2>Tolerance trend</h2>
-              <p>Movement quality, fatigue and pain/discomfort across recent sessions.</p>
-            </div>
-          </div>
-          <div id="toleranceChart" class="chart-box" role="img" aria-label="Quality fatigue and pain trend chart"></div>
-          <p id="toleranceSummary" class="chart-summary"></p>
-        </article>
+        <article class="panel chart-card wide"><div class="section-heading"><h2>Weekly dose attainment</h2><p>Active minutes and repetitions compared with programme targets.</p></div><div id="doseChart" class="chart-box"></div><p id="doseChartSummary" class="chart-summary"></p></article>
+        <article class="panel chart-card"><div class="section-heading"><h2>Active vs scheduled practice</h2><p>How much scheduled time becomes active practice.</p></div><div id="activeScheduledChart" class="chart-box compact"></div><p id="activeScheduledSummary" class="chart-summary"></p></article>
+        <article class="panel chart-card"><div class="section-heading"><h2>Carryover distribution</h2><p>Whether practice transfers into daily function.</p></div><div id="carryoverChart" class="donut-wrap"></div><p id="carryoverSummary" class="chart-summary"></p></article>
+        <article class="panel chart-card wide"><div class="section-heading"><h2>Tolerance trend</h2><p>Movement quality, fatigue and pain across recent sessions.</p></div><div id="toleranceChart" class="chart-box"></div><p id="toleranceSummary" class="chart-summary"></p></article>
       </section>
 
-      <section class="panel insight-panel">
-        <div class="section-heading">
-          <h2>AI-Generated Clinical Review</h2>
-          <p>Explainable rule-based prompts for clinician review. The therapist remains responsible for clinical decisions.</p>
-        </div>
-        <div id="insights" class="insights"></div>
-      </section>
+      <section class="panel insight-panel"><div class="section-heading"><h2>AI-Generated Clinical Review</h2><p>Explainable rule-based prompts for clinician review. The therapist remains responsible for clinical decisions.</p></div><div id="insights" class="insights"></div></section>
 
-      <section class="panel">
-        <div class="section-heading">
-          <h2>Case risk heatmap</h2>
-          <p>Rapid triage across dose, quality, fatigue, pain, carryover and review status.</p>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Case</th>
-                <th>Goal</th>
-                <th>Dose</th>
-                <th>Quality</th>
-                <th>Fatigue</th>
-                <th>Pain</th>
-                <th>Carryover</th>
-                <th>Review</th>
-              </tr>
-            </thead>
-            <tbody id="caseTable"></tbody>
-          </table>
-        </div>
-      </section>
+      <section class="panel"><div class="section-heading"><h2>Case risk heatmap</h2><p>Rapid triage across dose, quality, fatigue, pain, carryover and review status.</p></div><div class="table-wrap"><table><thead><tr><th>Case</th><th>Goal</th><th>Dose</th><th>Quality</th><th>Fatigue</th><th>Pain</th><th>Carryover</th><th>Review</th></tr></thead><tbody id="caseTable"></tbody></table></div></section>
     </section>
 
-    <section id="programmes" class="tab-panel">
+    <section id="programmes" class="tab-panel" hidden>
       <div class="two-column">
         <section class="panel">
-          <div class="section-heading">
-            <h2>Programme</h2>
-            <p>Create the recovery context before logging sessions.</p>
-          </div>
+          <div class="section-heading"><h2>Programme</h2><p>Create the recovery context before logging sessions.</p></div>
           <form id="caseForm">
             <input id="caseId" type="hidden" />
-            <label>
-              Case / patient label
-              <input id="caseLabel" type="text" placeholder="e.g. Case A, initials only" maxlength="48" required />
-            </label>
-            <div class="grid-2">
-              <label>
-                Diagnosis / pathway
-                <select id="diagnosis">
-                  <option>Stroke</option>
-                  <option>Spinal cord injury</option>
-                  <option>Traumatic brain injury</option>
-                  <option>Parkinson's disease</option>
-                  <option>Multiple sclerosis</option>
-                  <option>Post-surgical rehabilitation</option>
-                  <option>Frailty / falls risk</option>
-                  <option>Other neurological condition</option>
-                </select>
-              </label>
-              <label>
-                Rehabilitation phase
-                <select id="phase">
-                  <option>Acute</option>
-                  <option>Subacute</option>
-                  <option>Inpatient rehabilitation</option>
-                  <option>Outpatient</option>
-                  <option>Community</option>
-                  <option>Home programme</option>
-                  <option>Chronic / long-term management</option>
-                </select>
-              </label>
-            </div>
-            <div class="grid-2">
-              <label>
-                Primary impairment / domain
-                <select id="domain">
-                  <option>Upper limb</option>
-                  <option>Gait</option>
-                  <option>Balance</option>
-                  <option>Functional task practice</option>
-                  <option>Cognition</option>
-                  <option>Speech / swallowing</option>
-                  <option>ADL / participation</option>
-                  <option>Mixed programme</option>
-                </select>
-              </label>
-              <label>
-                Goal status
-                <select id="goalStatus">
-                  <option>Not started</option>
-                  <option selected>In progress</option>
-                  <option>Improving</option>
-                  <option>Plateauing</option>
-                  <option>Met</option>
-                  <option>Revised</option>
-                </select>
-              </label>
-            </div>
-            <label>
-              Primary functional goal
-              <textarea id="primaryGoal" rows="3" placeholder="e.g. Improve safe sit-to-stand transfer for independent bathroom access" required></textarea>
-            </label>
-            <label>
-              Secondary goals
-              <textarea id="secondaryGoals" rows="2" placeholder="e.g. Reduce caregiver assistance; improve home practice consistency"></textarea>
-            </label>
-            <div class="grid-3">
-              <label>
-                Weekly active minutes
-                <input id="weeklyMinutes" type="number" min="0" value="180" required />
-              </label>
-              <label>
-                Weekly repetitions
-                <input id="weeklyReps" type="number" min="0" value="1000" required />
-              </label>
-              <label>
-                Minimum quality
-                <input id="minimumQuality" type="number" min="1" max="5" value="3" required />
-              </label>
-            </div>
-            <div class="grid-2">
-              <label>
-                Review date
-                <input id="reviewDate" type="date" />
-              </label>
-              <label>
-                Responsible clinician
-                <input id="clinician" type="text" placeholder="Therapist / team" maxlength="60" />
-              </label>
-            </div>
-            <label>
-              ICF / participation frame
-              <textarea id="icfFrame" rows="2" placeholder="e.g. activity limitation: transfers; participation goal: independent bathroom access; environmental factor: home toilet height"></textarea>
-            </label>
-            <label>
-              Precautions / clinical boundaries
-              <textarea id="precautions" rows="2" placeholder="e.g. monitor fatigue; avoid high-challenge standing when pain > 6/10"></textarea>
-            </label>
+            <label>Case / patient label <input id="caseLabel" type="text" placeholder="e.g. Case 01 · Stroke UL" maxlength="64" required /></label>
+            <div class="grid-2"><label>Diagnosis / pathway <select id="diagnosis"><option>Stroke</option><option>Spinal cord injury</option><option>Traumatic brain injury</option><option>Parkinson's disease</option><option>Multiple sclerosis</option><option>Post-surgical rehabilitation</option><option>Frailty / falls risk</option><option>Other neurological condition</option></select></label><label>Rehabilitation phase <select id="phase"><option>Acute</option><option>Subacute</option><option>Inpatient rehabilitation</option><option>Outpatient</option><option>Community</option><option>Home programme</option><option>Chronic / long-term management</option></select></label></div>
+            <div class="grid-2"><label>Primary impairment / domain <select id="domain"><option>Upper limb</option><option>Gait</option><option>Balance</option><option>Functional task practice</option><option>Cognition</option><option>Speech / swallowing</option><option>ADL / participation</option><option>Mixed programme</option></select></label><label>Goal status <select id="goalStatus"><option>Not started</option><option selected>In progress</option><option>Improving</option><option>Plateauing</option><option>Met</option><option>Revised</option></select></label></div>
+            <label>Primary functional goal <textarea id="primaryGoal" rows="3" placeholder="e.g. Improve safe sit-to-stand transfer for independent bathroom access" required></textarea></label>
+            <label>Secondary goals <textarea id="secondaryGoals" rows="2" placeholder="e.g. Reduce caregiver assistance; improve home practice consistency"></textarea></label>
+            <div class="grid-3"><label>Weekly active minutes <input id="weeklyMinutes" type="number" min="0" value="180" required /></label><label>Weekly repetitions <input id="weeklyReps" type="number" min="0" value="1000" required /></label><label>Minimum quality <input id="minimumQuality" type="number" min="1" max="5" value="3" required /></label></div>
+            <div class="grid-2"><label>Review date <input id="reviewDate" type="date" /></label><label>Responsible clinician <input id="clinician" type="text" placeholder="Therapist / team" maxlength="60" /></label></div>
+            <label>ICF / participation frame <textarea id="icfFrame" rows="2" placeholder="Activity limitation, participation goal and environmental factors"></textarea></label>
+            <label>Precautions / clinical boundaries <textarea id="precautions" rows="2" placeholder="e.g. monitor fatigue; review pain > 6/10"></textarea></label>
             <button type="submit" class="primary">Save programme</button>
           </form>
         </section>
-
-        <section class="panel">
-          <div class="section-heading">
-            <h2>Programme list</h2>
-            <p>Select a programme by using the review focus. Use pseudonymous case labels in this public prototype.</p>
-          </div>
-          <div id="programmeList" class="cards-list"></div>
-        </section>
+        <section class="panel"><div class="section-heading"><h2>Programme list</h2><p>18 synthetic sample cases load by default and can be reloaded using Load sample.</p></div><div id="programmeList" class="cards-list"></div></section>
       </div>
     </section>
 
-    <section id="sessions" class="tab-panel">
+    <section id="sessions" class="tab-panel" hidden>
       <div class="two-column">
         <section class="panel">
-          <div class="section-heading">
-            <h2>Therapy session</h2>
-            <p>Record what was actually done, not just what was scheduled.</p>
-          </div>
+          <div class="section-heading"><h2>Therapy session</h2><p>Record what was actually done, not just what was scheduled.</p></div>
           <form id="sessionForm">
-            <label>
-              Case
-              <select id="sessionCaseId" required></select>
-            </label>
-            <div class="grid-2">
-              <label>
-                Date
-                <input id="date" type="date" required />
-              </label>
-              <label>
-                Setting
-                <select id="setting">
-                  <option>Clinic</option>
-                  <option>Inpatient gym</option>
-                  <option>Ward</option>
-                  <option>Home</option>
-                  <option>Community</option>
-                  <option>Tele-rehab</option>
-                </select>
-              </label>
-            </div>
-            <label>
-              Task practised
-              <input id="task" type="text" placeholder="e.g. sit-to-stand, reaching, walking, grasp-release" required />
-            </label>
-            <div class="grid-3">
-              <label>
-                Scheduled minutes
-                <input id="minutes" type="number" min="0" step="1" value="30" required />
-              </label>
-              <label>
-                Active practice minutes
-                <input id="activeMinutes" type="number" min="0" step="1" value="25" required />
-              </label>
-              <label>
-                Repetitions
-                <input id="reps" type="number" min="0" step="1" value="100" required />
-              </label>
-            </div>
-            <div class="grid-3">
-              <label>
-                Movement quality <span class="hint">1-5</span>
-                <input id="quality" type="number" min="1" max="5" step="1" value="3" required />
-              </label>
-              <label>
-                Fatigue <span class="hint">0-10</span>
-                <input id="fatigue" type="number" min="0" max="10" step="1" value="4" required />
-              </label>
-              <label>
-                Pain / discomfort <span class="hint">0-10</span>
-                <input id="pain" type="number" min="0" max="10" step="1" value="0" required />
-              </label>
-            </div>
-            <div class="grid-2">
-              <label>
-                Assistance level
-                <select id="assistance">
-                  <option>Independent</option>
-                  <option>Verbal cueing</option>
-                  <option>Manual assist</option>
-                  <option>Robotic assist</option>
-                  <option>Caregiver assist</option>
-                  <option>Mixed assist</option>
-                </select>
-              </label>
-              <label>
-                Challenge level
-                <select id="challenge">
-                  <option>Too easy</option>
-                  <option selected>Appropriate</option>
-                  <option>Too difficult</option>
-                </select>
-              </label>
-            </div>
-            <div class="grid-2">
-              <label>
-                Task specificity
-                <select id="specificity">
-                  <option>Directly linked to functional goal</option>
-                  <option>Partially linked to functional goal</option>
-                  <option>General conditioning / preparatory</option>
-                  <option>Unclear link</option>
-                </select>
-              </label>
-              <label>
-                Carryover observed?
-                <select id="carryover">
-                  <option>Not assessed</option>
-                  <option>Yes, in daily activity</option>
-                  <option>Partial</option>
-                  <option>No</option>
-                </select>
-              </label>
-            </div>
-            <div class="grid-2">
-              <label>
-                Home adherence
-                <select id="homeAdherence">
-                  <option>Not applicable</option>
-                  <option>High</option>
-                  <option>Moderate</option>
-                  <option>Low</option>
-                  <option>Not reported</option>
-                </select>
-              </label>
-              <label>
-                Rest breaks
-                <input id="restBreaks" type="number" min="0" step="1" value="1" />
-              </label>
-            </div>
-            <label>
-              Clinical notes
-              <textarea id="notes" rows="4" placeholder="Context, barriers, therapist observations, home practice notes"></textarea>
-            </label>
+            <label>Case <select id="sessionCaseId" required></select></label>
+            <div class="grid-2"><label>Date <input id="date" type="date" required /></label><label>Setting <select id="setting"><option>Clinic</option><option>Inpatient gym</option><option>Ward</option><option>Home</option><option>Community</option><option>Tele-rehab</option></select></label></div>
+            <label>Task practised <input id="task" type="text" placeholder="e.g. sit-to-stand, reaching, walking, grasp-release" required /></label>
+            <div class="grid-3"><label>Scheduled minutes <input id="minutes" type="number" min="0" step="1" value="30" required /></label><label>Active practice minutes <input id="activeMinutes" type="number" min="0" step="1" value="25" required /></label><label>Repetitions <input id="reps" type="number" min="0" step="1" value="100" required /></label></div>
+            <div class="grid-3"><label>Movement quality <span class="hint">1-5</span><input id="quality" type="number" min="1" max="5" step="1" value="3" required /></label><label>Fatigue <span class="hint">0-10</span><input id="fatigue" type="number" min="0" max="10" step="1" value="4" required /></label><label>Pain / discomfort <span class="hint">0-10</span><input id="pain" type="number" min="0" max="10" step="1" value="0" required /></label></div>
+            <div class="grid-2"><label>Assistance level <select id="assistance"><option>Independent</option><option>Verbal cueing</option><option>Manual assist</option><option>Robotic assist</option><option>Caregiver assist</option><option>Mixed assist</option></select></label><label>Challenge level <select id="challenge"><option>Too easy</option><option selected>Appropriate</option><option>Too difficult</option></select></label></div>
+            <div class="grid-2"><label>Task specificity <select id="specificity"><option>Directly linked to functional goal</option><option>Partially linked to functional goal</option><option>General conditioning / preparatory</option><option>Unclear link</option></select></label><label>Carryover observed? <select id="carryover"><option>Not assessed</option><option>Yes, in daily activity</option><option>Partial</option><option>No</option></select></label></div>
+            <div class="grid-2"><label>Home adherence <select id="homeAdherence"><option>Not applicable</option><option>High</option><option>Moderate</option><option>Low</option><option>Not reported</option></select></label><label>Rest breaks <input id="restBreaks" type="number" min="0" step="1" value="1" /></label></div>
+            <label>Clinical notes <textarea id="notes" rows="4" placeholder="Context, barriers, therapist observations, home practice notes"></textarea></label>
             <button type="submit" class="primary">Save session</button>
           </form>
         </section>
-
-        <section class="panel">
-          <div class="section-heading">
-            <h2>Recent sessions</h2>
-            <p>Recent entries for the selected review focus.</p>
-          </div>
-          <div id="sessionsList" class="sessions-list"></div>
-        </section>
+        <section class="panel"><div class="section-heading"><h2>Recent sessions</h2><p>Sample data includes 54 synthetic therapy sessions across 18 cases.</p></div><div id="sessionsList" class="sessions-list"></div></section>
       </div>
     </section>
 
-    <section id="outcomes" class="tab-panel">
+    <section id="outcomes" class="tab-panel" hidden>
       <div class="two-column">
         <section class="panel">
-          <div class="section-heading">
-            <h2>Outcome measure</h2>
-            <p>Link dose to functional trajectory. Check scoring rights and local policy before using formal scales clinically.</p>
-          </div>
+          <div class="section-heading"><h2>Outcome measure</h2><p>Link dose to functional trajectory. Check scoring rights and local policy before using formal scales clinically.</p></div>
           <form id="outcomeForm">
-            <label>
-              Case
-              <select id="outcomeCaseId" required></select>
-            </label>
-            <label>
-              Outcome name
-              <input id="outcomeName" type="text" placeholder="e.g. 10MWT, 6MWT, TUG, ARAT, GAS, patient-specific goal" required />
-            </label>
-            <div class="grid-3">
-              <label>
-                Baseline
-                <input id="baselineValue" type="text" placeholder="e.g. 0.42 m/s" />
-              </label>
-              <label>
-                Current
-                <input id="currentValue" type="text" placeholder="e.g. 0.58 m/s" />
-              </label>
-              <label>
-                Target
-                <input id="targetValue" type="text" placeholder="e.g. 0.70 m/s" />
-              </label>
-            </div>
-            <div class="grid-2">
-              <label>
-                Measurement date
-                <input id="outcomeDate" type="date" />
-              </label>
-              <label>
-                Direction
-                <select id="outcomeDirection">
-                  <option>Higher is better</option>
-                  <option>Lower is better</option>
-                  <option>Goal-specific</option>
-                </select>
-              </label>
-            </div>
-            <label>
-              Clinician note
-              <textarea id="outcomeNote" rows="2" placeholder="Measurement condition, assistive device, cueing, or caveats"></textarea>
-            </label>
+            <label>Case <select id="outcomeCaseId" required></select></label>
+            <label>Outcome name <input id="outcomeName" type="text" placeholder="e.g. 10MWT, 6MWT, TUG, ARAT, GAS, patient-specific goal" required /></label>
+            <div class="grid-3"><label>Baseline <input id="baselineValue" type="text" placeholder="e.g. 0.42 m/s" /></label><label>Current <input id="currentValue" type="text" placeholder="e.g. 0.58 m/s" /></label><label>Target <input id="targetValue" type="text" placeholder="e.g. 0.70 m/s" /></label></div>
+            <div class="grid-2"><label>Measurement date <input id="outcomeDate" type="date" /></label><label>Direction <select id="outcomeDirection"><option>Higher is better</option><option>Lower is better</option><option>Goal-specific</option></select></label></div>
+            <label>Clinician note <textarea id="outcomeNote" rows="2" placeholder="Measurement condition, assistive device, cueing, or caveats"></textarea></label>
             <button type="submit" class="primary">Save outcome</button>
           </form>
         </section>
-
-        <section class="panel">
-          <div class="section-heading">
-            <h2>Functional trajectory</h2>
-            <p>Baseline, current and target values shown as visual trajectory markers when numeric values are available.</p>
-          </div>
-          <div id="outcomeTrajectoryChart" class="outcome-visuals"></div>
-          <div id="outcomesList" class="sessions-list"></div>
-        </section>
+        <section class="panel"><div class="section-heading"><h2>Functional trajectory</h2><p>Baseline, current and target values shown as visual trajectory markers when numeric values are available.</p></div><div id="outcomeTrajectoryChart" class="outcome-visuals"></div><div id="outcomesList" class="sessions-list"></div></section>
       </div>
     </section>
 
-    <section id="reports" class="tab-panel">
-      <section class="panel report-panel">
-        <div class="section-heading">
-          <h2>Clinical report preview</h2>
-          <p>Print-ready summary for review, handover, pilot evaluation and documentation support.</p>
-        </div>
-        <div id="reportPreview" class="report-preview"></div>
-      </section>
-
-      <section class="panel">
-        <div class="section-heading">
-          <h2>Pilot evidence summary</h2>
-          <p>Operational indicators for clinical pilot review.</p>
-        </div>
-        <div id="evidenceSummary" class="evidence-grid"></div>
-        <p class="small-note">Exports are intended for review, pilot evaluation and documentation support. They are not regulatory submissions or validated EHR integrations.</p>
-      </section>
+    <section id="reports" class="tab-panel" hidden>
+      <section class="panel report-panel"><div class="section-heading"><h2>Clinical report preview</h2><p>Print-ready summary for review, handover, pilot evaluation and documentation support.</p></div><div id="reportPreview" class="report-preview"></div></section>
+      <section class="panel"><div class="section-heading"><h2>Pilot evidence summary</h2><p>Operational indicators for clinical pilot review.</p></div><div id="evidenceSummary" class="evidence-grid"></div><p class="small-note">Exports are intended for review, pilot evaluation and documentation support. They are not regulatory submissions or validated EHR integrations.</p></section>
     </section>
   </main>
 
@@ -494,6 +141,6 @@
     <p>This tool is for tracking, education, workflow exploration and pilot evidence generation only. It is not medical advice and does not replace a licensed clinician. Avoid entering directly identifiable patient information in this static GitHub Pages prototype.</p>
   </footer>
 
-  <script src="app.js"></script>
+  <script defer src="app-v4.js?v=20260712-3"></script>
 </body>
 </html>
