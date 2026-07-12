@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NeuroRehab Dose Tracker</title>
-  <link rel="stylesheet" href="styles.css?v=20260712-3" />
-  <link rel="stylesheet" href="overrides.css?v=20260712-3" />
+  <link rel="stylesheet" href="styles.css?v=20260712-4" />
+  <link rel="stylesheet" href="overrides.css?v=20260712-4" />
 </head>
 <body>
   <header class="app-header">
@@ -15,17 +15,34 @@
       <p class="subtitle">Plan programmes, track multidimensional dose, visualise recovery patterns, and export clinician-readable rehabilitation evidence.</p>
       <p class="disclaimer-mini">Prototype only. Not medical advice, not a diagnostic system, and not a replacement for licensed clinical judgement. Sample records are synthetic.</p>
     </div>
-    <div class="header-actions" aria-label="Data and export actions">
-      <button id="loadSampleBtn" type="button" class="secondary">Load sample</button>
-      <button id="exportCsvBtn" type="button" class="secondary">Export CSV</button>
-      <button id="exportNoteBtn" type="button" class="secondary">Export progress note</button>
-      <button id="exportFhirBtn" type="button" class="secondary">Export FHIR JSON</button>
-      <button id="backupBtn" type="button" class="secondary">Backup JSON</button>
-      <label class="file-button secondary" tabindex="0">
-        Restore JSON
-        <input id="restoreInput" type="file" accept="application/json,.json" />
-      </label>
-      <button id="clearBtn" type="button" class="danger">Clear data</button>
+    <div class="header-controls">
+      <div class="language-switcher">
+        <button id="languageButton" type="button" class="language-button secondary" aria-haspopup="true" aria-expanded="false" aria-controls="languageMenu">
+          <span aria-hidden="true">🌐</span>
+          <span id="languageButtonLabel">English</span>
+          <span aria-hidden="true">▾</span>
+        </button>
+        <div id="languageMenu" class="language-menu" role="menu" hidden>
+          <button type="button" role="menuitemradio" data-language="en" lang="en">English</button>
+          <button type="button" role="menuitemradio" data-language="zh-Hans" lang="zh-Hans">简体中文</button>
+          <button type="button" role="menuitemradio" data-language="es" lang="es">Español</button>
+          <button type="button" role="menuitemradio" data-language="fr" lang="fr">Français</button>
+          <button type="button" role="menuitemradio" data-language="de" lang="de">Deutsch</button>
+          <button type="button" role="menuitemradio" data-language="ms" lang="ms">Bahasa Melayu</button>
+        </div>
+      </div>
+      <div class="header-actions" aria-label="Data and export actions">
+        <button id="loadSampleBtn" type="button" class="secondary">Load sample</button>
+        <button id="exportCsvBtn" type="button" class="secondary">Export CSV</button>
+        <button id="exportNoteBtn" type="button" class="secondary">Export progress note</button>
+        <button id="exportFhirBtn" type="button" class="secondary">Export FHIR JSON</button>
+        <button id="backupBtn" type="button" class="secondary">Backup JSON</button>
+        <label class="file-button secondary" tabindex="0">
+          Restore JSON
+          <input id="restoreInput" type="file" accept="application/json,.json" />
+        </label>
+        <button id="clearBtn" type="button" class="danger">Clear data</button>
+      </div>
     </div>
   </header>
 
@@ -141,6 +158,7 @@
     <p>This tool is for tracking, education, workflow exploration and pilot evidence generation only. It is not medical advice and does not replace a licensed clinician. Avoid entering directly identifiable patient information in this static GitHub Pages prototype.</p>
   </footer>
 
-  <script defer src="app-v4.js?v=20260712-3"></script>
+  <script defer src="i18n.js?v=20260712-4"></script>
+  <script defer src="app-v4.js?v=20260712-4"></script>
 </body>
 </html>
