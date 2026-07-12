@@ -135,10 +135,15 @@
       .sort((a, b) => (order.get(a.id) ?? 1000) - (order.get(b.id) ?? 1000) || String(a.name).localeCompare(String(b.name)));
   }
 
+  function nativeCheckboxes(picker) {
+    return [...picker.querySelectorAll('input[name="sessionEquipment"]')]
+      .filter(input => !input.closest("#sessionEquipmentHiddenInputs"));
+  }
+
   function selectedFromExistingPicker(picker) {
     const select = picker.querySelector("#sessionEquipmentSelect");
     if (select) return select.value ? [select.value] : [];
-    return [...picker.querySelectorAll('input[name="sessionEquipment"]:checked')].map(input => input.value);
+    return nativeCheckboxes(picker).filter(input => input.checked).map(input => input.value);
   }
 
   function syncHiddenInput(picker) {
@@ -146,11 +151,11 @@
     const hidden = picker.querySelector("#sessionEquipmentHiddenInputs");
     if (!select || !hidden) return;
     hidden.innerHTML = select.value
-      ? `<input type="checkbox" name="sessionEquipment" value="${cssEscape(select.value)}" checked />`
+      ? `<input type="checkbox" name="sessionEquipment" value="${htmlEscape(select.value)}" checked />`
       : "";
   }
 
-  function cssEscape(value) {
+  function htmlEscape(value) {
     return String(value ?? "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
@@ -163,7 +168,7 @@
     const picker = document.getElementById("sessionEquipmentPicker");
     if (!picker || renderingDropdown) return;
     const hasDropdown = picker.querySelector("#sessionEquipmentSelect");
-    const hasNativeCheckboxes = picker.querySelector('input[name="sessionEquipment"]');
+    const hasNativeCheckboxes = nativeCheckboxes(picker).length > 0;
     if (hasDropdown && !hasNativeCheckboxes) return;
     const previouslySelected = selectedFromExistingPicker(picker);
     const items = activeEquipment();
@@ -175,7 +180,7 @@
         <span>Equipment dropdown list</span>
         <select id="sessionEquipmentSelect" name="sessionEquipmentSelect">
           <option value="">No equipment selected</option>
-          ${items.map(item => `<option value="${cssEscape(item.id)}" ${item.id === selectedId ? "selected" : ""}>${cssEscape(item.name)} · ${cssEscape(item.category)}</option>`).join("")}
+          ${items.map(item => `<option value="${htmlEscape(item.id)}" ${item.id === selectedId ? "selected" : ""}>${htmlEscape(item.name)} · ${htmlEscape(item.category)}</option>`).join("")}
         </select>
       </label>
       <p class="small-note">Use the Equipment tab to edit, add, deactivate or delete equipment options.</p>
@@ -208,7 +213,7 @@
     if (!picker || observer) return;
     observer = new MutationObserver(() => {
       const hasDropdown = picker.querySelector("#sessionEquipmentSelect");
-      const hasNativeCheckboxes = picker.querySelector('input[name="sessionEquipment"]');
+      const hasNativeCheckboxes = nativeCheckboxes(picker).length > 0;
       if (!renderingDropdown && (!hasDropdown || hasNativeCheckboxes)) queueMicrotask(renderEquipmentDropdown);
     });
     observer.observe(picker, { childList: true, subtree: true });
