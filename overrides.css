@@ -98,6 +98,32 @@ html[lang="zh-Hans"] body {
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 10px;
 }
+.equipment-dropdown-wrap {
+  display: block !important;
+}
+.equipment-dropdown-label {
+  display: grid;
+  gap: 8px;
+  min-height: auto;
+}
+.equipment-dropdown-label span {
+  color: var(--text);
+  font-weight: 900;
+}
+.equipment-dropdown-label select {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255,255,255,.075);
+  color: var(--text);
+  padding: 10px 12px;
+  font-weight: 750;
+}
+.equipment-dropdown-label select:focus-visible {
+  outline: 3px solid rgba(117,211,255,.45);
+  outline-offset: 2px;
+}
 .equipment-option {
   display: flex;
   align-items: flex-start;
