@@ -2,6 +2,58 @@
   "use strict";
 
   const APP_KEY = "neurorehabDoseTracker.v5";
+  const REQUIRED_EQUIPMENT = [
+    {
+      id: "equipment-handvivante",
+      name: "HandVivante™",
+      category: "Upper-limb robotics",
+      manufacturer: "Robotimize",
+      model: "",
+      identifier: "",
+      status: "Active",
+      notes: "Robotic hand and upper-limb rehabilitation equipment.",
+    },
+    {
+      id: "equipment-gaitvivante",
+      name: "GaitVivante™",
+      category: "Gait robotics",
+      manufacturer: "Robotimize",
+      model: "",
+      identifier: "",
+      status: "Active",
+      notes: "Robotic gait rehabilitation equipment.",
+    },
+    {
+      id: "equipment-elevovivante",
+      name: "ElevoVivante™",
+      category: "Therapy technology",
+      manufacturer: "Robotimize",
+      model: "",
+      identifier: "",
+      status: "Active",
+      notes: "Configurable rehabilitation equipment example.",
+    },
+    {
+      id: "equipment-revitavivante",
+      name: "RevitaVivante™",
+      category: "FES / electrostimulation",
+      manufacturer: "Robotimize",
+      model: "",
+      identifier: "",
+      status: "Active",
+      notes: "Functional electrical stimulation rehabilitation equipment.",
+    },
+    {
+      id: "equipment-custom-clinic-research",
+      name: "Custom clinic or research devices",
+      category: "Other",
+      manufacturer: "",
+      model: "",
+      identifier: "",
+      status: "Active",
+      notes: "Placeholder option for locally configured clinic, pilot, research or prototype equipment.",
+    },
+  ];
   const LEGACY_ID_MAP = new Map([
     ["eq-handvivante", "equipment-handvivante"],
     ["eq-gaitvivante", "equipment-gaitvivante"],
@@ -10,26 +62,57 @@
     ["eq-none", ""],
   ]);
 
+  let observer;
+  let renderingDropdown = false;
+
+  function appState() {
+    try {
+      if (typeof state !== "undefined" && state && Array.isArray(state.sessions)) return state;
+    } catch { /* ignore */ }
+    return readState();
+  }
+
   function readState() {
     try {
-      const state = JSON.parse(localStorage.getItem(APP_KEY));
-      return state && Array.isArray(state.sessions) ? state : null;
+      const parsed = JSON.parse(localStorage.getItem(APP_KEY));
+      return parsed && Array.isArray(parsed.sessions) ? parsed : null;
     } catch {
       return null;
     }
   }
 
-  function writeState(state) {
-    try { localStorage.setItem(APP_KEY, JSON.stringify(state)); } catch { /* ignore */ }
+  function writeState(nextState) {
+    try {
+      if (typeof save === "function" && nextState === appState()) save();
+      else localStorage.setItem(APP_KEY, JSON.stringify(nextState));
+    } catch {
+      try { localStorage.setItem(APP_KEY, JSON.stringify(nextState)); } catch { /* ignore */ }
+    }
+  }
+
+  function ensureRequiredEquipment() {
+    const nextState = appState();
+    if (!nextState) return;
+    if (!Array.isArray(nextState.equipment)) nextState.equipment = [];
+    const now = new Date().toISOString();
+    const byId = new Map(nextState.equipment.map(item => [item.id, item]));
+    let changed = false;
+    for (const seed of REQUIRED_EQUIPMENT) {
+      if (!byId.has(seed.id)) {
+        nextState.equipment.push({ ...seed, createdAt: now, updatedAt: now });
+        changed = true;
+      }
+    }
+    if (changed) writeState(nextState);
   }
 
   function migrateLegacyEquipmentFields() {
-    const state = readState();
-    if (!state) return;
+    const nextState = appState();
+    if (!nextState) return;
     let changed = false;
-    for (const session of state.sessions) {
-      if (Array.isArray(session.equipmentIds) && session.equipmentIds.length) continue;
-      if (!Array.isArray(session.equipment) || !session.equipment.length) continue;
+    for (const session of nextState.sessions) {
+      if (!Array.isArray(session.equipmentIds)) session.equipmentIds = [];
+      if (session.equipmentIds.length || !Array.isArray(session.equipment)) continue;
       const ids = session.equipment
         .map(id => LEGACY_ID_MAP.has(id) ? LEGACY_ID_MAP.get(id) : id)
         .filter(Boolean);
@@ -39,13 +122,73 @@
       }
       delete session.equipment;
     }
-    if (changed) writeState(state);
+    if (changed) writeState(nextState);
+  }
+
+  function activeEquipment() {
+    ensureRequiredEquipment();
+    const nextState = appState();
+    if (!nextState || !Array.isArray(nextState.equipment)) return REQUIRED_EQUIPMENT;
+    const order = new Map(REQUIRED_EQUIPMENT.map((item, index) => [item.id, index]));
+    return [...nextState.equipment]
+      .filter(item => item.status !== "Inactive")
+      .sort((a, b) => (order.get(a.id) ?? 1000) - (order.get(b.id) ?? 1000) || String(a.name).localeCompare(String(b.name)));
+  }
+
+  function selectedFromExistingPicker(picker) {
+    const select = picker.querySelector("#sessionEquipmentSelect");
+    if (select) return select.value ? [select.value] : [];
+    return [...picker.querySelectorAll('input[name="sessionEquipment"]:checked')].map(input => input.value);
+  }
+
+  function syncHiddenInput(picker) {
+    const select = picker.querySelector("#sessionEquipmentSelect");
+    const hidden = picker.querySelector("#sessionEquipmentHiddenInputs");
+    if (!select || !hidden) return;
+    hidden.innerHTML = select.value
+      ? `<input type="checkbox" name="sessionEquipment" value="${escapeHtml(select.value)}" checked />`
+      : "";
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function renderEquipmentDropdown() {
+    const picker = document.getElementById("sessionEquipmentPicker");
+    if (!picker || renderingDropdown) return;
+    const previouslySelected = selectedFromExistingPicker(picker);
+    const items = activeEquipment();
+    const selectedId = previouslySelected.find(id => items.some(item => item.id === id)) || "";
+    renderingDropdown = true;
+    picker.classList.add("equipment-dropdown-wrap");
+    picker.innerHTML = `
+      <label class="equipment-dropdown-label" for="sessionEquipmentSelect">
+        <span>Equipment dropdown list</span>
+        <select id="sessionEquipmentSelect" name="sessionEquipmentSelect">
+          <option value="">No equipment selected</option>
+          ${items.map(item => `<option value="${escapeHtml(item.id)}" ${item.id === selectedId ? "selected" : ""}>${escapeHtml(item.name)} · ${escapeHtml(item.category)}</option>`).join("")}
+        </select>
+      </label>
+      <p class="small-note">Use the Equipment tab to edit, add, deactivate or delete equipment options.</p>
+      <div id="sessionEquipmentHiddenInputs" hidden></div>`;
+    syncHiddenInput(picker);
+    picker.querySelector("#sessionEquipmentSelect")?.addEventListener("change", () => syncHiddenInput(picker));
+    renderingDropdown = false;
+  }
+
+  function prepareSubmitBridge(event) {
+    const picker = document.getElementById("sessionEquipmentPicker");
+    if (picker && event.target?.id === "sessionForm") syncHiddenInput(picker);
   }
 
   function repairTabButtons() {
-    const buttons = Array.from(document.querySelectorAll(".tab-button[data-tab]"));
-    if (!buttons.length) return;
-    buttons.forEach(button => {
+    document.querySelectorAll(".tab-button[data-tab]").forEach(button => {
       button.type = "button";
       button.setAttribute("aria-controls", button.dataset.tab);
     });
@@ -57,10 +200,25 @@
     }
   }
 
+  function startPickerObserver() {
+    const picker = document.getElementById("sessionEquipmentPicker");
+    if (!picker || observer) return;
+    observer = new MutationObserver(() => {
+      if (!renderingDropdown) queueMicrotask(renderEquipmentDropdown);
+    });
+    observer.observe(picker, { childList: true, subtree: true });
+  }
+
+  ensureRequiredEquipment();
+  migrateLegacyEquipmentFields();
+
+  document.addEventListener("submit", prepareSubmitBridge, true);
   document.addEventListener("DOMContentLoaded", () => {
-    migrateLegacyEquipmentFields();
     repairTabButtons();
+    renderEquipmentDropdown();
+    startPickerObserver();
     surfaceEquipmentHash();
     window.addEventListener("hashchange", surfaceEquipmentHash);
+    window.addEventListener("languagechange", () => queueMicrotask(renderEquipmentDropdown));
   });
 })();
