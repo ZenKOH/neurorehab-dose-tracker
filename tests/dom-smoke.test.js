@@ -22,7 +22,12 @@ function launch(existingState) {
     );
   }
   dom.window.eval(fs.readFileSync(path.join(root, "i18n.js"), "utf8"));
-  dom.window.eval(fs.readFileSync(path.join(root, "app-v4.js"), "utf8"));
+  dom.window.eval(
+    [
+      fs.readFileSync(path.join(root, "app-v4.js"), "utf8"),
+      fs.readFileSync(path.join(root, "case-expansion.js"), "utf8"),
+    ].join("\n"),
+  );
   dom.window.document.dispatchEvent(
     new dom.window.Event("DOMContentLoaded", { bubbles: true }),
   );
@@ -185,7 +190,7 @@ test("FHIR-shaped export contains Device and Procedure references for equipment"
     (entry) => entry.resource.resourceType === "Procedure",
   );
   assert.equal(devices.length, 4);
-  assert.equal(procedures.length, 54);
+  assert.equal(procedures.length, 108);
   assert.ok(
     procedures.some((entry) => entry.resource.usedReference.length > 0),
   );
@@ -218,7 +223,7 @@ test("header command buttons execute their documented actions", () => {
   assert.match(csv[1], /equipmentNames,equipmentIds/);
 
   document.getElementById("loadSampleBtn").click();
-  assert.match(document.getElementById("appStatus").textContent, /Loaded 18/);
+  assert.match(document.getElementById("appStatus").textContent, /Loaded 36/);
 
   let restoreClicks = 0;
   document.getElementById("restoreInput").click = () => restoreClicks++;
@@ -234,6 +239,6 @@ test("header command buttons execute their documented actions", () => {
   const saved = JSON.parse(
     dom.window.localStorage.getItem("neurorehabDoseTracker.v5"),
   );
-  assert.equal(saved.cases.length, 18);
+  assert.equal(saved.cases.length, 36);
   dom.window.close();
 });

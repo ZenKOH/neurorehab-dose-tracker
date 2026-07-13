@@ -7,6 +7,8 @@ This is no longer just a session diary. The upgraded app is designed as a lightw
 ## What it does
 
 - Create therapy programmes around a case label, diagnosis/pathway, rehabilitation phase, primary functional goal, secondary goals, precautions, clinician, review date, and weekly targets.
+- Load 36 synthetic sample cases spanning stroke, SCI, TBI, cerebral palsy, Parkinson's disease, multiple sclerosis, frailty, vestibular, peripheral neurological, progressive neurological, MSK, orthopaedic and amputee rehabilitation pathways.
+- Review mocked training data across 108 synthetic sessions and 72 outcome records, including training protocol, scheduled time, active practice time, repetitions, assistance, carryover, equipment and tolerance markers.
 - Track multidimensional rehabilitation dose:
   - scheduled minutes
   - active practice minutes
@@ -20,6 +22,7 @@ This is no longer just a session diary. The upgraded app is designed as a lightw
   - rest breaks
   - home adherence
   - functional carryover
+- Store a training protocol or dose rationale for each programme so task selection remains linked to clinical intent.
 - Track configurable outcome measures such as 10MWT, 6MWT, TUG, ARAT, Goal Attainment Scaling, or patient-specific goals.
 - Select session equipment from a dropdown list and maintain an editable equipment library:
   - HandVivante™
@@ -142,6 +145,7 @@ Translations are product-localisation drafts and should receive native-speaking 
 
 - Targets remain clinician-configurable and needs-based. NICE recommends needs-based multidisciplinary rehabilitation after stroke and explicitly preserves individual clinical judgement; the prototype therefore does not impose a single target across diagnoses or phases.
 - Scheduled time, active practice, repetitions, tolerance, equipment use and functional carryover remain distinct measures rather than being collapsed into one dose score.
+- The expanded sample set treats protocols as structured context, not automated treatment instructions. The goal is to support review of dose, quality, feasibility and carryover across classic rehabilitation pathways.
 - Session equipment is selected from a native dropdown to reduce click load during documentation while still preserving an editable equipment library.
 - The active page language is declared in the HTML document in line with W3C accessibility guidance.
 - Navigation destinations use native links with stable URL fragments, while downloads, form submissions and destructive operations remain action buttons.
@@ -151,6 +155,11 @@ Translations are product-localisation drafts and should receive native-speaking 
 Primary references:
 
 - [NICE NG236: Stroke rehabilitation in adults](https://www.nice.org.uk/guidance/ng236/chapter/Recommendations)
+- [NICE NG62: Cerebral palsy in under 25s](https://www.nice.org.uk/guidance/ng62/chapter/Recommendations)
+- [NICE NG220: Multiple sclerosis in adults](https://www.nice.org.uk/guidance/ng220/chapter/Recommendations)
+- [NICE NG71: Parkinson's disease in adults](https://www.nice.org.uk/guidance/ng71/chapter/Recommendations)
+- [NICE NG211: Rehabilitation after traumatic injury](https://www.nice.org.uk/guidance/ng211/chapter/Recommendations)
+- [NICE NG226: Osteoarthritis in over 16s](https://www.nice.org.uk/guidance/ng226/chapter/Recommendations)
 - [WHO: Rehabilitation fact sheet](https://www.who.int/news-room/fact-sheets/detail/rehabilitation)
 - [W3C: Understanding language of page](https://www.w3.org/WAI/WCAG22/Understanding/language-of-page.html)
 - [W3C WAI: Forms Tutorial](https://www.w3.org/WAI/tutorials/forms/)
@@ -178,6 +187,7 @@ The test suite checks all supported language codes, representative clinical tran
 - [x] Equipment dropdown in session logging
 - [x] Equipment library and session-device linkage
 - [x] Equipment utilisation analytics
+- [x] Case-level protocol and dose-rationale field
 - [x] Therapist dashboard
 - [x] Explainable review prompts
 - [x] Progress note export
@@ -193,7 +203,7 @@ The test suite checks all supported language codes, representative clinical tran
 - [ ] Clinic-level dashboard
 - [ ] Consent and privacy settings
 - [ ] PDF reports
-- [ ] Configurable protocols
+- [ ] Configurable protocol library and templates
 
 ### Phase 3: Pilot evidence layer
 
